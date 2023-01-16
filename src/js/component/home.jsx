@@ -16,15 +16,10 @@ const Home = () => {
         } else {
             setTodos([...todos, {"label":input, "done":false}]);
 			setInput("")
-        }
-         
-        }
-
-
+        }}
 
     const clickBorrar = () => {
         setTodos([])
-        killTodos()
     }
 
 
@@ -35,7 +30,6 @@ const Home = () => {
   useEffect(() => {
     getTodos()
   uptdateTodos()
-  console.log(todosEnServer)
   },[todos])
 
 
@@ -72,7 +66,7 @@ const Home = () => {
 		.then((data)=>console.log(todosEnServer))
 	}
 
-    function killTodos(){
+   /* function killTodos(){
 		fetch(`https://assets.breatheco.de/apis/fake/todos/user/locomotion`,
 		{method: 'DELETE', 
 		headers: {
@@ -80,7 +74,7 @@ const Home = () => {
 	  })
 		.then((response)=>response.json())
 		.then((data)=>console.log(data))
-	}
+	} */
 
 
     return (
@@ -126,14 +120,14 @@ const Home = () => {
                         
                         {/* <p>{todosEnServer.length}</p> */}
                         
-
-                        <ul>
 {
-todosEnServer.map((todo, i)=>{
-return (<li key={i}>{todo.label}</li>)
-})
-}
-</ul>
+            <ul>
+    {
+    todosEnServer.map((todo, i)=>{
+    return (<li key={i}>{todo.label}</li>)
+    })
+    }
+</ul>  }
                         
                         </div>
 
