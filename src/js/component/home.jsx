@@ -1,9 +1,10 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
+
 
 const Home = () => {
     const [input, setInput] = useState("");
     const [todos, setTodos] = useState([]);
-
+    const [todosEnServer, setTodosEnServer] = useState([])
 
     function handleInput(e) {
         setInput(e.target.value);
@@ -13,14 +14,73 @@ const Home = () => {
         if (input.length === 0) {
             alert("Debe ingresar un valor")
         } else {
-            setTodos(todos.concat([input]));
+            setTodos([...todos, {"label":input, "done":false}]);
 			setInput("")
         }
-    }
+         
+        }
+
+
 
     const clickBorrar = () => {
         setTodos([])
+        killTodos()
     }
+
+
+    useEffect(() => {
+        userPush()     
+    }, [])
+
+  useEffect(() => {
+    getTodos()
+  uptdateTodos()
+  console.log(todosEnServer)
+  },[todos])
+
+
+  function userPush(){
+    fetch(`https://assets.breatheco.de/apis/fake/todos/user/locomotion`,
+    {method: 'POST', 
+    headers: {
+        'Content-Type': 'application/json'},
+    body: JSON.stringify([])
+  })
+    .then((response)=>response.json())
+    .then((data)=>console.log(data))
+}
+
+    function getTodos(){
+		fetch(`https://assets.breatheco.de/apis/fake/todos/user/locomotion`,
+		{method: 'GET', 
+		headers: {
+			'Content-Type': 'application/json'}
+	  })
+		.then((response)=>response.json())
+		.then((data)=>setTodosEnServer(data))
+	}
+
+
+    function uptdateTodos(){
+		fetch(`https://assets.breatheco.de/apis/fake/todos/user/locomotion`,
+		{method: 'PUT', 
+		headers: {
+			'Content-Type': 'application/json'},
+		body: JSON.stringify(todos)
+	  })
+		.then((response)=>response.json())
+		.then((data)=>console.log(todosEnServer))
+	}
+
+    function killTodos(){
+		fetch(`https://assets.breatheco.de/apis/fake/todos/user/locomotion`,
+		{method: 'DELETE', 
+		headers: {
+			'Content-Type': 'application/json'}
+	  })
+		.then((response)=>response.json())
+		.then((data)=>console.log(data))
+	}
 
 
     return (
@@ -34,32 +94,49 @@ const Home = () => {
                         <button onClick={handleClick}
                             className="btn btn-success"
                             type="button"
-							style={{backgroundColor:"rgb(110, 19, 214)"}}
+                            style={
+                                {backgroundColor: "rgb(110, 19, 214)"}
+                            }
                             id="button-addon1">Ingresar Tarea</button>
                         <input onChange={handleInput}
                             type="text"
                             className="form-control"
                             placeholder=""
-							value={input}
+                            value={input}
                             aria-label="Example text with button addon"
                             aria-describedby="button-addon1"/>
                     </div>
                     <div id="contenedorTodos" className="text-light">
                         {
-                        todos.map((item, index) => (
-                            <div className="row d-flex m-2"  style={{borderRadius:"20px",backgroundColor: "rgb(110, 19, 214)"}}>
-                                <div className="col-6">
-                                    <h5 className="m-2">{item}</h5>
-                                </div>
-                                <div className="col-6 text-end">
-                                    <i class="fas fa-trash-alt align-items-end m-2 pt-1"
-                                        onClick={
-                                            () => setTodos(todos.filter((elementoDiv, currentIndex) => index != currentIndex))
-                                    }></i>
-                                </div>
-                            </div>
-                        ))
+                        
+                        <ul>{todos.map((todo, i) => (
+                            <li key={i}>
+                              {todo.label}
+                              <button className="btn" onClick={() => setTodos(todos.filter((elemento, currentIndex) => i != currentIndex))}>
+                                <i className="fas fa-trash-alt align-items-end m-2 pt-1" />
+                              </button>
+                            </li>
+                          ))}</ul>
+                        
                     } </div>
+
+                    {/* Aquí vamos a contar los todos que se encuentren en el lado del servidor */}
+                    <div id="contenedorTodos" className="text-light">
+                        <h5>Todos en el servidor</h5>
+                        
+                        {/* <p>{todosEnServer.length}</p> */}
+                        
+
+                        <ul>
+{
+todosEnServer.map((todo, i)=>{
+return (<li key={i}>{todo.label}</li>)
+})
+}
+</ul>
+                        
+                        </div>
+
                     <div id="contadorTodos">
                         <p className="text-light mt-3">Faltan por realizar {
                             todos.length
